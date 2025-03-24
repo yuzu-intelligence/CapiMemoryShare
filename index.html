@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Capi</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: white;
+    }
+
+    .container {
+      padding: 12px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+    }
+
+    .back-button {
+      margin-right: 10px;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .title {
+      flex: 1;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .hero-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-top: 10px;
+    }
+
+    .media-thumbs {
+      display: flex;
+      margin-top: 10px;
+    }
+
+    .media-thumb {
+      width: 50px;
+      height: 50px;
+      margin-right: 5px;
+      border-radius: 5px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .media-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .media-thumb .cover-text {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      background-color: #475569;
+      color: white;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .location-date {
+      margin-top: 15px;
+    }
+
+    .location {
+      font-weight: 500;
+    }
+
+    .date {
+      color: #6f6f6f;
+      font-size: 14px;
+    }
+
+    .tabs {
+      display: flex;
+      background-color: #f0f0f0;
+      margin-top: 16px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background-color: #eaeaea;
+      font-weight: bold;
+    }
+
+    .section {
+      margin-top: 20px;
+      padding: 14px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      background-color: white;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    .section-content {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    .key-point {
+      display: flex;
+      align-items: center;
+      padding: 8px 10px;
+      background-color: #f9f9f9;
+      margin-top: 5px;
+      border-radius: 5px;
+    }
+
+    .key-point input[type="checkbox"] {
+      margin-right: 10px;
+    }
+
+    .key-point span.checked {
+      /* text-decoration: line-through; */
+      color: #777;
+    }
+
+    .bottom-nav {
+      display: flex;
+      justify-content: space-evenly;
+      background-color: rgba(110, 113, 115, 0.1);
+      padding: 10px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      border-top: 1px solid #ccc;
+    }
+
+    .nav-item {
+      font-size: 14px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="title">Event Title Goes Here</div>
+  </div>
+
+  <div class="container">
+    <img src="https://via.placeholder.com/600x200" class="hero-image" alt="Cover Image" />
+
+    <div class="media-thumbs">
+      <!-- Media thumbnails will be inserted here -->
+    </div>
+
+    <div class="location-date">
+      <div class="location">Location Placeholder</div>
+      <div class="date">Date Placeholder</div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab" data-tab="transcription">Transcription</div>
+      <div class="tab active" data-tab="summary">Summary</div>
+      <div class="tab" data-tab="media">Media</div>
+    </div>
+
+    <div class="tab-content" id="transcription-tab" style="display:none;"></div>
+    <div class="tab-content" id="summary-tab">
+        <div class="section">
+            <div class="section-title">Overview</div>
+            <div class="section-content">
+              Summary
+            </div>
+          </div>
+      
+          <div class="section">
+            <div class="section-title">Key Points</div>
+            <!-- Key points will be inserted here -->
+          </div>
+    </div>
+    <div class="tab-content" id="media-tab" style="display:none;"></div>
+
+    
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      function getQueryParam(name) {
+        const params = new URLSearchParams(window.location.search);
+        return params.get(name);
+      }
+
+      const rawData = getQueryParam('data');
+      if (rawData) {
+        try {
+          const jsonData = JSON.parse(decodeURIComponent(rawData));
+          console.log(jsonData);
+          // Set title
+          if (jsonData.title) {
+            document.querySelector('.title').textContent = jsonData.title;
+          }
+
+          // Hero image
+          if (jsonData.heroImage) {
+            document.querySelector('.hero-image').src = jsonData.heroImage;
+          }
+
+          // Media thumbnails
+          if (Array.isArray(jsonData.media)) {
+            const mediaContainer = document.querySelector('.media-thumbs');
+            mediaContainer.innerHTML = '';
+            jsonData.media.forEach(item => {
+              const div = document.createElement('div');
+              div.className = 'media-thumb';
+              div.innerHTML = `
+                <img src="${item.url}" alt="${item.type}" />
+                `;
+              if(item.type === 'COVER') {
+                div.innerHTML += `<div class="cover-text">${item.type}</div>`
+              }
+              mediaContainer.appendChild(div);
+            });
+
+            const mediaTab = document.getElementById('media-tab');
+            mediaTab.innerHTML = `<div class="media-thumbs">` + jsonData.media.map(item => `
+              <div class="media-thumb"  style="margin-top: 10px;">
+                <img src="${item.url}" alt="${item.type}" />
+              </div>
+            `).join('') + `</div>`;
+          }
+
+          // Location and date
+          if (jsonData.location) {
+            document.querySelector('.location').textContent = jsonData.location;
+          }
+          if (jsonData.date) {
+            document.querySelector('.date').textContent = jsonData.date;
+          }
+
+          // Overview
+          if (jsonData.overview) {
+            document.querySelector('.section-content').textContent = jsonData.overview;
+          }
+
+          // Key Points with checkboxes
+          if (Array.isArray(jsonData.keyPoints)) {
+            const keyPointsSection = document.querySelectorAll('.section')[1];
+            const content = jsonData.keyPoints.map((point, index) => `
+              <label class="key-point">
+                <input 
+                  disabled 
+                  type="checkbox" 
+                  ${point.checked ? 'checked' : ''} 
+                  data-index="${index}"
+                />
+                <span class="${point.checked ? 'checked' : ''}">${point.text}</span>
+              </label>
+            `).join('');
+            keyPointsSection.innerHTML = `
+              <div class="section-title">Key Points</div>
+              ${content}
+            `;
+
+            // Add checkbox event listeners
+            keyPointsSection.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+              cb.addEventListener('change', function () {
+                const index = parseInt(this.getAttribute('data-index'));
+                const span = this.nextElementSibling;
+                if (this.checked) {
+                  span.classList.add('checked');
+                } else {
+                  span.classList.remove('checked');
+                }
+              });
+            });
+          }
+
+          // Handle transcription rendering
+        if (Array.isArray(jsonData.transcription)) {
+            const transEl = document.getElementById('transcription-tab');
+            transEl.innerHTML = jsonData.transcription.map(entry => `
+                <div style="margin-top: 10px;">
+                <div style="font-weight: bold; margin-bottom: 5px;">
+                    ${entry.speaker} <span style="font-weight: normal; font-size: 12px;">${entry.start}–${entry.end}</span>
+                </div>
+                <div style="background: #f9f9f9; border-radius: 10px; padding: 10px; font-size: 14px;">
+                    ${entry.text}
+                </div>
+                </div>
+            `).join('');
+        }
+
+        // Tab switching logic
+        document.querySelectorAll('.tab').forEach(tab => {
+          tab.addEventListener('click', () => {
+              document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+              tab.classList.add('active');
+
+              const selected = tab.dataset.tab;
+              document.querySelectorAll('.tab-content').forEach(content => {
+                  content.style.display = content.id === `${selected}-tab` ? 'block' : 'none';
+              });
+          });
+      });
+
+        } catch (e) {
+          console.error('Invalid JSON in query param:', e);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
