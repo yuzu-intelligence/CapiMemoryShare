@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-   <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-      <title>Capi</title>
-      <style>
-         body {
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capi</title>
+    <style>
+        body {
          margin: 0;
          font-family: Arial, sans-serif;
          background-color: white;
@@ -147,257 +148,335 @@
          color: #333;
          }
          .media-thumb .play-icon {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 22px;
-            color: white;
-            background-color: rgba(0, 0, 0, 0.2);
-            padding: 8px 10px;
-            pointer-events: none;
-          }
-      </style>
-   </head>
-   <body>
-      <div class="header">
-         <div class="title">Event Title Goes Here</div>
-      </div>
-      <div class="container">
-         <img src="https://via.placeholder.com/600x200" class="hero-image" alt="Cover Image" />
-         <div class="media-thumbs">
+         position: absolute;
+         top: 50%;
+         left: 50%;
+         transform: translate(-50%, -50%);
+         font-size: 22px;
+         color: white;
+         background-color: rgba(0, 0, 0, 0.2);
+         padding: 8px 10px;
+         pointer-events: none;
+         }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="title"></div>
+    </div>
+    <div class="container">
+        <img src="https://pickle.romoo.com/capybara2.png" class="hero-image" alt="Cover Image" />
+        <div class="media-thumbs">
             <!-- Media thumbnails will be inserted here -->
-         </div>
-         <div class="location-date">
+        </div>
+        <div class="location-date">
             <div>
-               <div class="location">Location Placeholder</div>
-               <div class="date">Date Placeholder</div>
+                <div class="location">Location Placeholder</div>
+                <div class="date">Date Placeholder</div>
             </div>
             <button class="share-button">Share</button>
-         </div>
-         <div class="tabs">
+        </div>
+        <div class="tabs">
             <div class="tab" data-tab="transcription">Transcription</div>
             <div class="tab active" data-tab="summary">Summary</div>
             <div class="tab" data-tab="media">Media</div>
-         </div>
-         <div class="tab-content" id="transcription-tab" style="display:none;"></div>
-         <div class="tab-content" id="summary-tab">
+        </div>
+        <div class="tab-content" id="transcription-tab" style="display:none;"></div>
+        <div class="tab-content" id="summary-tab">
             <div class="section">
-               <div class="section-title">Overview</div>
-               <div class="section-content">
-                  Summary
-               </div>
+                <div class="section-title">Overview</div>
+                <div class="section-content">
+                    Summary
+                </div>
             </div>
             <div class="section">
-               <div class="section-title">Key Points</div>
-               <!-- Key points will be inserted here -->
+                <div class="section-title">Key Points</div>
+                <!-- Key points will be inserted here -->
             </div>
-         </div>
-         <div class="tab-content" id="media-tab" style="display:none;"></div>
-      </div>
-      <!-- Video Modal -->
-      <div id="videoModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000;">
-         <div style="position: relative; max-width: 90%; max-height: 90%;">
+        </div>
+        <div class="tab-content" id="media-tab" style="display:none;"></div>
+    </div>
+    <!-- Video Modal -->
+    <div id="videoModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000;">
+        <div style="position: relative; max-width: 90%; max-height: 90%;">
             <span id="closeModal" style="position:absolute; top:-20px; right:-10px; font-size:30px; color:white; cursor:pointer;">&times;</span>
             <video id="modalVideo" controls style="width:100%; height:auto; border-radius: 8px;">
-               <source id="modalSource" src="" type="video/mp4" />
-               Your browser does not support the video tag.
+                <source id="modalSource" src="" type="video/mp4" /> Your browser does not support the video tag.
             </video>
-         </div>
-      </div>
-      <script>
-         document.addEventListener('DOMContentLoaded', function () {
-           function getQueryParam(name) {
-             const params = new URLSearchParams(window.location.search);
-             return params.get(name);
-           }
-         
-           const rawData = getQueryParam('data');
-           if (rawData) {
-             try {
-               const jsonData = JSON.parse(decodeURIComponent(rawData));
-               console.log(jsonData);
-               // Set title
-               if (jsonData.title) {
-                 document.querySelector('.title').textContent = jsonData.title;
-               }
-         
-               // Hero image
-               if (jsonData.heroImage) {
-                 document.querySelector('.hero-image').src = jsonData.heroImage;
-               }
-         
-               // Media thumbnails
-               if (Array.isArray(jsonData.media)) {
-                 const mediaContainer = document.querySelector('.media-thumbs');
-                 mediaContainer.innerHTML = '';
-                 jsonData.media.forEach(item => {
-                   const div = document.createElement('div');
-                   div.className = 'media-thumb';
-                   div.innerHTML = ``;
-                   if(item.type === 'COVER') {
-                     div.innerHTML += ` <img src="${item.cover}" alt="${item.type}" /><div class="cover-text">${item.type}</div>`
-                   }else if(item.type === 'VIDEO') {
-                     div.innerHTML = `<img src="${item.cover}" alt="${item.type}" /> <div class="play-icon">&#9658;</div>`;
-                     div.style.cursor = 'pointer';
-                     div.addEventListener('click', () => {
-                       modalSource.src = item.url;
-                       modalVideo.load();
-                       videoModal.style.display = 'flex';
-                     });
-                   }
-                   mediaContainer.appendChild(div);
-                 });
-         
-                 const mediaTab = document.getElementById('media-tab');
-                  mediaTab.innerHTML = `
-                    <div class="media-thumbs">
-                      ${jsonData.media.map((item, index) => `
-                        <div class="media-thumb" style="margin-top: 10px;" data-type="${item.type}" data-url="${item.url || ''}" data-index="${index}">
-                          <img src="${item.cover}" alt="${item.type}" />
-                          ${item.type === 'VIDEO' ? '<div class="play-icon">&#9658;</div>' : ''}
-                        </div>
-                      `).join('')}
-                    </div>
-                  `;
-         
-                  mediaTab.querySelectorAll('.media-thumb').forEach(el => {
-                    const type = el.dataset.type;
-                    const url = el.dataset.url;
-                    if (type === 'VIDEO' && url) {
-                      el.style.cursor = 'pointer';
-                      el.addEventListener('click', () => {
-                        modalSource.src = url;
-                        modalVideo.load();
-                        videoModal.style.display = 'flex';
-                      });
-                    }
+        </div>
+    </div>
+    <script>
+        function formatEpochToDateString(epoch) {
+          const date = new Date(epoch);
+
+          const options = {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true,
+          };
+
+          return date.toLocaleString('en-US', options).replace(' at ', ' ');
+        }
+
+        function padZero(num, size) {
+          let s = num + '';
+          while (s.length < size) s = '0' + s;
+          return s;
+        };
+
+        function parseTimeCount(time) {
+          if (!time) {
+            return '00:00:00';
+          }
+          const hours = Math.floor(time / 3600);
+          const minutes = Math.floor((time % 3600) / 60);
+          const seconds = Math.floor(time % 60);
+          return `${padZero(hours, 2)}:${padZero(minutes, 2)}:${padZero(seconds, 2)}`;
+        };
+
+        
+    </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', async function () {
+        function getQueryParam(name) {
+          const params = new URLSearchParams(window.location.search);
+          return params.get(name);
+        }
+    
+        const shareId = getQueryParam('share_id');
+        if (!shareId) {
+          console.error('Missing share_id in URL');
+          return;
+        }
+    
+        const apiUrl = `https://caynoncats.com/chat/prod/public/events/get_shared_event/${shareId}`;
+        let rawData = {};
+    
+        try {
+          const response = await fetch(apiUrl);
+          if (!response.ok) throw new Error('Failed to fetch event data');
+          rawData = await response.json();
+        } catch (error) {
+          console.error('Error getting response!');
+          return;
+        }
+    
+        if (rawData) {
+          try {
+            const jsonData = rawData;
+    
+            // Set title
+            if (jsonData.title) {
+              document.querySelector('.title').textContent = jsonData.title;
+            }
+    
+            let media = [];
+            let transcriptions = [];
+            let audioUrl = '';
+    
+            // Hero image
+            if (jsonData.cover_url) {
+              document.querySelector('.hero-image').src = jsonData.cover_url;
+              media.push({ type: 'COVER', cover: jsonData.cover_url });
+            }
+    
+            // Media video
+            if (jsonData.media_video && Array.isArray(jsonData.media_video) && jsonData.media_video.length) {
+              const video = jsonData.media_video[0];
+              audioUrl = video.audio_url;
+              media.push({ type: 'VIDEO', cover: video.cover_url, url: video.url });
+              transcriptions = video.transcription?.data.map(item => ({
+                speaker: `Speaker ${item.speaker + 1}`,
+                start: parseTimeCount(item.start),
+                end: parseTimeCount(item.end),
+                text: item.text,
+              }));
+            }
+    
+            // Media audio
+            if (jsonData.media_audio && Array.isArray(jsonData.media_audio) && jsonData.media_audio.length) {
+              const audio = jsonData.media_audio[0];
+              audioUrl = audio.url;
+              transcriptions = audio.transcription?.data.map(item => ({
+                speaker: `Speaker ${item.speaker + 1}`,
+                start: parseTimeCount(item.start),
+                end: parseTimeCount(item.end),
+                text: item.text,
+              }));
+            }
+    
+            // Media thumbnails
+            if (Array.isArray(media)) {
+              const mediaContainer = document.querySelector('.media-thumbs');
+              mediaContainer.innerHTML = '';
+    
+              media.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'media-thumb';
+    
+                if (item.type === 'COVER') {
+                  div.innerHTML = `<img src="${item.cover}" alt="${item.type}" /><div class="cover-text">${item.type}</div>`;
+                } else if (item.type === 'VIDEO') {
+                  div.innerHTML = `<img src="${item.cover}" alt="${item.type}" /> <div class="play-icon">&#9658;</div>`;
+                  div.style.cursor = 'pointer';
+                  div.addEventListener('click', () => {
+                    modalSource.src = item.url;
+                    modalVideo.load();
+                    videoModal.style.display = 'flex';
                   });
-               }
-         
-               // Location and date
-               if (jsonData.location) {
-                 document.querySelector('.location').textContent = jsonData.location;
-               }
-               if (jsonData.date) {
-                 document.querySelector('.date').textContent = jsonData.date;
-               }
-         
-               // Overview
-               if (jsonData.overview) {
-                 document.querySelector('.section-content').textContent = jsonData.overview;
-               }
-         
-               // Key Points with checkboxes
-               if (Array.isArray(jsonData.keyPoints)) {
-                 const keyPointsSection = document.querySelectorAll('.section')[1];
-                 const content = jsonData.keyPoints.map((point, index) => `
-                   <label class="key-point">
-                     <input 
-                       disabled 
-                       type="checkbox" 
-                       ${point.checked ? 'checked' : ''} 
-                       data-index="${index}"
-                     />
-                     <span class="${point.checked ? 'checked' : ''}">${point.text}</span>
-                   </label>
-                 `).join('');
-                 keyPointsSection.innerHTML = `
-                   <div class="section-title">Key Points</div>
-                   ${content}
-                 `;
-         
-                 // Add checkbox event listeners
-                 keyPointsSection.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-                   cb.addEventListener('change', function () {
-                     const index = parseInt(this.getAttribute('data-index'));
-                     const span = this.nextElementSibling;
-                     if (this.checked) {
-                       span.classList.add('checked');
-                     } else {
-                       span.classList.remove('checked');
-                     }
-                   });
-                 });
-               }
-         
-               // Handle transcription rendering
-             if (Array.isArray(jsonData.transcription)) {
-               let audioHTML = '';
-               if (jsonData.audio_url) {
-                 audioHTML = `
-                   <div style="margin-bottom: 10px; margin-top: 10px;">
-                     <audio controls style="width: 100%;">
-                       <source src="${jsonData.audio_url}" type="audio/mpeg">
-                       Your browser does not support the audio element.
-                     </audio>
-                   </div>
-                 `;
-               }  
-               const transEl = document.getElementById('transcription-tab');
-                 const transcriptionHTML = jsonData.transcription.map(entry => `
-                     <div style="margin-top: 10px;">
-                     <div style="font-weight: bold; margin-bottom: 5px;">
-                         ${entry.speaker} <span style="font-weight: normal; font-size: 12px;">${entry.start}–${entry.end}</span>
-                     </div>
-                     <div style="background: #f9f9f9; border-radius: 10px; padding: 10px; font-size: 14px;">
-                         ${entry.text}
-                     </div>
-                     </div>
-                 `).join('');
-         
-                 transEl.innerHTML = audioHTML + transcriptionHTML;
-             }
-         
-         
-             // Tab switching logic
-             document.querySelectorAll('.tab').forEach(tab => {
-               tab.addEventListener('click', () => {
-                   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                   tab.classList.add('active');
-         
-                   const selected = tab.dataset.tab;
-                   document.querySelectorAll('.tab-content').forEach(content => {
-                       content.style.display = content.id === `${selected}-tab` ? 'block' : 'none';
-                   });
-               });
-           });
-         
-             } catch (e) {
-               console.error('Invalid JSON in query param:', e);
-             }
-           }
-         
-           const shareButton = document.querySelector('.share-button');
-            shareButton.addEventListener('click', async () => {
-              try {
-                await navigator.share({
-                  title: document.title,
-                  url: window.location.href,
+                }
+    
+                mediaContainer.appendChild(div);
+              });
+    
+              const mediaTab = document.getElementById('media-tab');
+              mediaTab.innerHTML = `
+                <div class="media-thumbs">
+                  ${media.map((item, index) => `
+                    <div class="media-thumb" style="margin-top: 10px;" data-type="${item.type}" data-url="${item.url || ''}" data-index="${index}">
+                      <img src="${item.cover}" alt="${item.type}" />
+                      ${item.type === 'VIDEO' ? '<div class="play-icon">&#9658;</div>' : ''}
+                    </div>
+                  `).join('')}
+                </div>
+              `;
+    
+              mediaTab.querySelectorAll('.media-thumb').forEach(el => {
+                const type = el.dataset.type;
+                const url = el.dataset.url;
+                if (type === 'VIDEO' && url) {
+                  el.style.cursor = 'pointer';
+                  el.addEventListener('click', () => {
+                    modalSource.src = url;
+                    modalVideo.load();
+                    videoModal.style.display = 'flex';
+                  });
+                }
+              });
+            }
+    
+            // Location
+            if (jsonData.location_string) {
+              document.querySelector('.location').textContent = jsonData.location_string;
+            }
+    
+            // Date
+            if (jsonData.time_start) {
+              const timeStr = formatEpochToDateString(jsonData.time_start * 1000);
+              document.querySelector('.date').textContent = timeStr;
+            }
+    
+            // Summary
+            if (jsonData.summary) {
+              document.querySelector('.section-content').textContent = jsonData.summary;
+            }
+    
+            // Key Points
+            if (jsonData.key_points && Array.isArray(jsonData.key_points.data)) {
+              const keypoints = jsonData.key_points.data.map((item, idx) => ({
+                text: item.text || item.item,
+                checked: item.marked,
+              }));
+    
+              const keyPointsSection = document.querySelectorAll('.section')[1];
+              const content = keypoints.map((point, index) => `
+                <label class="key-point">
+                  <input disabled type="checkbox" ${point.checked ? 'checked' : ''} data-index="${index}" />
+                  <span class="${point.checked ? 'checked' : ''}">${point.text}</span>
+                </label>
+              `).join('');
+    
+              keyPointsSection.innerHTML = `<div class="section-title">Key Points</div>${content}`;
+    
+              keyPointsSection.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.addEventListener('change', function () {
+                  const span = this.nextElementSibling;
+                  span.classList.toggle('checked', this.checked);
                 });
-              } catch (err) {
-                console.error('Sharing failed:', err);
+              });
+            }
+    
+            // Transcriptions
+            if (Array.isArray(transcriptions)) {
+              let audioHTML = '';
+              if (audioUrl) {
+                audioHTML = `
+                  <div style="margin-bottom: 10px; margin-top: 10px;">
+                    <audio controls style="width: 100%;">
+                      <source src="${audioUrl}" type="audio/mpeg">
+                      Your browser does not support the audio element.
+                    </audio>
+                  </div>
+                `;
               }
+    
+              const transEl = document.getElementById('transcription-tab');
+              const transcriptionHTML = transcriptions.map(entry => `
+                <div style="margin-top: 10px;">
+                  <div style="font-weight: bold; margin-bottom: 5px;">
+                    ${entry.speaker} <span style="font-weight: normal; font-size: 12px;">${entry.start}–${entry.end}</span>
+                  </div>
+                  <div style="background: #f9f9f9; border-radius: 10px; padding: 10px; font-size: 14px;">
+                    ${entry.text}
+                  </div>
+                </div>
+              `).join('');
+    
+              transEl.innerHTML = audioHTML + transcriptionHTML;
+            }
+    
+            // Tab switching
+            document.querySelectorAll('.tab').forEach(tab => {
+              tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+    
+                const selected = tab.dataset.tab;
+                document.querySelectorAll('.tab-content').forEach(content => {
+                  content.style.display = content.id === `${selected}-tab` ? 'block' : 'none';
+                });
+              });
             });
-         });
-         
-         const videoModal = document.getElementById('videoModal');
-         const modalVideo = document.getElementById('modalVideo');
-         const modalSource = document.getElementById('modalSource');
-         const closeModal = document.getElementById('closeModal');
-         
-         closeModal.onclick = function () {
-           videoModal.style.display = 'none';
-           modalVideo.pause();
-         };
-         
-         // Close on outside click
-         videoModal.onclick = function (e) {
-           if (e.target === videoModal) {
-             videoModal.style.display = 'none';
-             modalVideo.pause();
-           }
-         };
-      </script>
-   </body>
+    
+          } catch (e) {
+            console.error('Invalid JSON in query param:', e);
+          }
+        }
+    
+        const shareButton = document.querySelector('.share-button');
+        shareButton.addEventListener('click', async () => {
+          try {
+            await navigator.share({
+              title: document.title,
+              url: window.location.href,
+            });
+          } catch (err) {
+            console.error('Sharing failed:', err);
+          }
+        });
+      });
+    
+      const videoModal = document.getElementById('videoModal');
+      const modalVideo = document.getElementById('modalVideo');
+      const modalSource = document.getElementById('modalSource');
+      const closeModal = document.getElementById('closeModal');
+    
+      closeModal.onclick = function () {
+        videoModal.style.display = 'none';
+        modalVideo.pause();
+      };
+    
+      // Close on outside click
+      videoModal.onclick = function (e) {
+        if (e.target === videoModal) {
+          videoModal.style.display = 'none';
+          modalVideo.pause();
+        }
+      };
+    </script>       
+  </body>
 </html>
